@@ -177,6 +177,12 @@ class SMS(object):
         if status==ATResp.OK and len(imei)==1: return imei[0]
         return None
 
+    def getVersion(self):
+        self._logger("Get TA Revision Identification of Software Release")
+        status,revision=self.sendATCmdWaitReturnResp("AT+CGMR","OK")
+        if status==ATResp.OK and len(revision)==1: return revision[0]
+        return None
+
     def getSIMCCID(self):
         self._logger.debug("Get SIM Integrated Circuit Card Identifier (ICCID)")
         status,ccid=self.sendATCmdWaitReturnResp("AT+CCID","OK")
@@ -221,6 +227,7 @@ if __name__=="__main__":
     if not s.setEchoOff(): exit(1)
     print("Good to go!")
     print(s.getIMEI())
+    print(s.getVersion())
     print(s.getSIMCCID())
     print(s.getNetworkStatus())
     print(s.getRSSI())

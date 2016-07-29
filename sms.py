@@ -70,6 +70,9 @@ class SMS(object):
         self._logger.setLevel(loglevel)
 
     def setup(self):
+        """
+        Setup the IO to control the power and reset inputs and the serial port.
+        """
         self._logger.debug("Setup")
         IO.setmode(IO.BOARD)
         IO.setup(GSM_ON, IO.OUT, initial=IO.LOW)
@@ -77,6 +80,10 @@ class SMS(object):
         self._serial=Serial(self._port, self._baud)
 
     def reset(self):
+        """
+        Reset (turn on) the SIM800 module by taking the power line for >1s
+        and then wait 5s for the module to boot.
+        """
         self._logger.debug("Reset (duration ~6.2s)")
         IO.output(GSM_ON, IO.HIGH)
         sleep(1.2)
@@ -85,7 +92,7 @@ class SMS(object):
 
     def sendATCmdWaitResp(self, cmd, response, timeout=.5, interByteTimeout=.1, attempts=1):
         """
-        This function is designed to check for simple one line responses, i.e. 'OK'
+        This function is designed to check for simple one line responses, e.g. 'OK'.
         """
         self._logger.debug("Send AT Command: {}".format(cmd))
         self._serial.timeout=timeout
@@ -112,7 +119,7 @@ class SMS(object):
 
     def sendATCmdWaitReturnResp(self, cmd, response, timeout=.5, interByteTimeout=.1):
         """
-        This function is designed to return data and check for a final response, i.e. 'OK'
+        This function is designed to return data and check for a final response, e.g. 'OK'
         """        
         self._logger.debug("Send AT Command: {}".format(cmd))
         self._serial.timeout=timeout
@@ -134,6 +141,11 @@ class SMS(object):
         return (ATResp.ErrorDifferentResponse, None)
 
     def parseReply(self, data, beginning, divider=',', index=0):
+        """
+        Parse an AT response line by checking the reply starts with the expected prefix,
+        splitting the reply into its parts by the specified divider and then return the 
+        element of the response specified by index.
+        """
         self._logger.debug("Parse Reply: {}, {}, {}, {}".format(data, beginning, divider, index))
         if not data.startswith(beginning): return False, None
         data=data.replace(beginning,"")
@@ -142,6 +154,10 @@ class SMS(object):
         except IndexError: return False, None
 
     def getSingleResponse(self, cmd, response, beginning, divider=",", index=0):
+        """
+        Run a command, get a single line response and the parse using the
+        specified parameters.
+        """
         status,data=self.sendATCmdWaitReturnResp(cmd,response)
         if status!=ATResp.OK: return None
         if len(data)!=1: return None
@@ -150,6 +166,10 @@ class SMS(object):
         return data
 
     def turnOn(self):
+        """
+        Check to see if the module is on, if so return. If not, attempt to
+        reset the module and then check that it is responding.
+        """
         self._logger.debug("Turn On")
         for i in range(2):
             status=self.sendATCmdWaitResp("AT", "OK", attempts=5)
@@ -166,48 +186,69 @@ class SMS(object):
         return False
 
     def setEchoOff(self):
+        """
+        Switch off command echoing to simply response parsing.
+        """
         self._logger.debug("Set Echo Off")
         self.sendATCmdWaitResp("ATE0", "OK")
         status=self.sendATCmdWaitResp("ATE0", "OK")
         return status==ATResp.OK
 
     def getIMEI(self):
+        """
+        Get the IMEI number of the module
+        """
         self._logger.debug("Get Internation Mobile Equipment Identity (IMEI)")
         status,imei=self.sendATCmdWaitReturnResp("AT+GSN","OK")
         if status==ATResp.OK and len(imei)==1: return imei[0]
         return None
 
     def getVersion(self):
+        """
+        Get the module firmware version.
+        """
         self._logger.debug("Get TA Revision Identification of Software Release")
-        #status,revision=self.sendATCmdWaitReturnResp("AT+CGMR","OK")
-        #if status==ATResp.OK and len(revision)==1: return revision[0]
-        #return None
         revision=self.getSingleResponse("AT+CGMR","OK","Revision",divider=":",index=1)
         return revision
 
     def getSIMCCID(self):
+        """
+        The the SIM ICCID.
+        """
         self._logger.debug("Get SIM Integrated Circuit Card Identifier (ICCID)")
         status,ccid=self.sendATCmdWaitReturnResp("AT+CCID","OK")
         if status==ATResp.OK and len(ccid)==1: return ccid[0]
         return None        
 
     def getNetworkStatus(self):
+        """
+        Get the current network connection status.
+        """
         self._logger.debug("Get Network Status")
         status=self.getSingleResponse("AT+CREG?","OK","+CREG: ",index=1)
         if status is None: return status
         return NetworkStatus(int(status))
 
     def getRSSI(self):
+        """
+        Get the current signal strength in 'bars'
+        """
         self._logger.debug("Get Received Signal Strength Indication (RSSI)")
         csq=self.getSingleResponse("AT+CSQ","OK","+CSQ: ")
         if csq is None: return csq
         return RSSI.fromCSQ(csq)
 
     def setSMSMessageFormat(self, format):
+        """
+        Set the SMS message format either as PDU or text.
+        """
         status=self.sendATCmdWaitResp("AT+CMGF={}".format(format), "OK")
         return status==ATResp.OK
 
     def sendSMS(self, phoneNumber, msg):
+        """
+        Send the specified message text to the provided phone number.
+        """
         self._logger.debug("Send SMS: {} '{}'".format(phoneNumber, msg))
         if not self.setSMSMessageFormat(SMSMeesageFormat.Text): return False
 

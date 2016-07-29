@@ -248,6 +248,11 @@ class SMS(object):
         if csq is None: return csq
         return RSSI.fromCSQ(csq)
 
+    def enableNetworkTimeSync(self, enable):
+        self._logger.debug("Enable network time synchronisation")
+        status=self.sendATCmdWaitResp("AT+CLTS={}".format(int(enable)),"OK")
+        return status==ATResp.OK
+
     def getTime(self):
         """
         Get the current time
@@ -294,6 +299,7 @@ if __name__=="__main__":
     print(s.getLastError())
     print(s.getNetworkStatus())
     print(s.getRSSI())
+    print(s.enableNetworkTimeSync(True))
     print(s.getTime())
     print(s.sendSMS("+441234567890", "Hello World!"))
     print(s.getLastError())

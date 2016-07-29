@@ -2,11 +2,13 @@ from serial import Serial
 import RPi.GPIO as IO, atexit, logging, sys
 from time import sleep
 from enum import IntEnum
+from datetime import datetime
 
 PORT="/dev/ttyAMA0"
 BAUD=9600
 GSM_ON=11
 GSM_RESET=12
+DATE_FMT='"%y/%m/%d,%H:%M:%S+00"'
 
 class ATResp(IntEnum):
     ErrorNoResponse=-1
@@ -252,10 +254,8 @@ class SMS(object):
         """
         self._logger.debug("Get the current time")
         time=self.getSingleResponse("AT+CCLK?","OK","+CCLK: ", divider="'")
-        return time
-        #if csq is None: return csq
-        #return RSSI.fromCSQ(csq)
-
+        if time is None: return time
+        return datetime.strptime(time, DATE_FMT)
 
     def setSMSMessageFormat(self, format):
         """

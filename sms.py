@@ -178,7 +178,7 @@ class SMS(object):
         return None
 
     def getVersion(self):
-        self._logger("Get TA Revision Identification of Software Release")
+        self._logger.debug("Get TA Revision Identification of Software Release")
         status,revision=self.sendATCmdWaitReturnResp("AT+CGMR","OK")
         if status==ATResp.OK and len(revision)==1: return revision[0]
         return None

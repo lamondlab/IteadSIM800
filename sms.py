@@ -194,6 +194,14 @@ class SMS(object):
         status=self.sendATCmdWaitResp("ATE0", "OK")
         return status==ATResp.OK
 
+    def getLastError(self):
+        """
+        Get readon for last error
+        """
+        self._logger.debug("Get Last Error")
+        error=self.getSingleResponse("AT+CEER","OK","+CEER: ")
+        return error
+
     def getIMEI(self):
         """
         Get the IMEI number of the module

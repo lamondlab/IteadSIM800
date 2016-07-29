@@ -179,9 +179,11 @@ class SMS(object):
 
     def getVersion(self):
         self._logger.debug("Get TA Revision Identification of Software Release")
-        status,revision=self.sendATCmdWaitReturnResp("AT+CGMR","OK")
-        if status==ATResp.OK and len(revision)==1: return revision[0]
-        return None
+        #status,revision=self.sendATCmdWaitReturnResp("AT+CGMR","OK")
+        #if status==ATResp.OK and len(revision)==1: return revision[0]
+        #return None
+        revision=self.getSingleResponse("AT+CGMR","OK","Revision",divider=":",index=1)
+        return revision
 
     def getSIMCCID(self):
         self._logger.debug("Get SIM Integrated Circuit Card Identifier (ICCID)")

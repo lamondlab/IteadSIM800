@@ -262,6 +262,14 @@ class SMS(object):
         if time is None: return time
         return datetime.strptime(time, DATE_FMT)
 
+    def setTime(self, time):
+        """
+        """
+        self._logger.debug("Set the current time: {}".format(time))
+        time=datetime.strftime(time, DATE_FMT)
+        status=self.sendATCmdWaitResp("AT+CCLK={}".format(time),"OK")
+        return status==ATResp.OK
+
     def setSMSMessageFormat(self, format):
         """
         Set the SMS message format either as PDU or text.
@@ -299,7 +307,9 @@ if __name__=="__main__":
     print(s.getLastError())
     print(s.getNetworkStatus())
     print(s.getRSSI())
-    print(s.enableNetworkTimeSync(True))
+    #print(s.enableNetworkTimeSync(True))
+    print(s.getTime())
+    print(s.setTime(datetime.now()))
     print(s.getTime())
     print(s.sendSMS("+441234567890", "Hello World!"))
     print(s.getLastError())

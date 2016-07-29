@@ -280,6 +280,8 @@ if __name__=="__main__":
     print(s.getIMEI())
     print(s.getVersion())
     print(s.getSIMCCID())
+    print(s.getLastError())
     print(s.getNetworkStatus())
     print(s.getRSSI())
     print(s.sendSMS("+441234567890", "Hello World!"))
+    print(s.getLastError())

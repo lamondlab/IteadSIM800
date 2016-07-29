@@ -246,6 +246,17 @@ class SMS(object):
         if csq is None: return csq
         return RSSI.fromCSQ(csq)
 
+    def getTime(self):
+        """
+        Get the current time
+        """
+        self._logger.debug("Get the current time")
+        time=self.getSingleResponse("AT+CCLK?","OK","+CCLK: ")
+        return time
+        #if csq is None: return csq
+        #return RSSI.fromCSQ(csq)
+
+
     def setSMSMessageFormat(self, format):
         """
         Set the SMS message format either as PDU or text.
@@ -283,5 +294,6 @@ if __name__=="__main__":
     print(s.getLastError())
     print(s.getNetworkStatus())
     print(s.getRSSI())
+    print(s.getTime())
     print(s.sendSMS("+441234567890", "Hello World!"))
     print(s.getLastError())

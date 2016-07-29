@@ -224,4 +224,4 @@ if __name__=="__main__":
     print(s.getSIMCCID())
     print(s.getNetworkStatus())
     print(s.getRSSI())
-    print(s.sendSMS("+447595348713", "Hello World!"))
+    print(s.sendSMS("+441234567890", "Hello World!"))

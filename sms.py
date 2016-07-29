@@ -251,7 +251,7 @@ class SMS(object):
         Get the current time
         """
         self._logger.debug("Get the current time")
-        time=self.getSingleResponse("AT+CCLK?","OK","+CCLK: ")
+        time=self.getSingleResponse("AT+CCLK?","OK","+CCLK: ", divider="'")
         return time
         #if csq is None: return csq
         #return RSSI.fromCSQ(csq)

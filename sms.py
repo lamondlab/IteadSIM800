@@ -146,7 +146,10 @@ class SMS(object):
         self._serial.write(cmd.encode('utf-8')+b'\r')
         self._serial.flush()
         lines=self._serial.readlines()
-        lines=[l.decode('utf-8').strip() for l in lines]
+        for n in range(len(lines)):
+            try: lines[n]=lines[n].decode('utf-8').strip()
+            except UnicodeDecodeError: lines[n]=lines[n].decode('latin1').strip()
+
         lines=[l for l in lines if len(l) and not l.isspace()]        
         self._logger.debug("Lines: {}".format(lines))
 
@@ -317,10 +320,6 @@ class SMS(object):
         self._logger.debug("Send USSD: {}".format(ussd))
         reply=self.getSingleResponse('AT+CUSD=1,"{}"'.format(ussd), "OK", "+CUSD: ", index=1, timeout=11., interByteTimeout=1.2)
         return reply
-
-    #### USSD
-    #### PDU Mode(?)
-    #### *140*# for balance(?)
 
 if __name__=="__main__":
     s=SMS(PORT,BAUD,logging.DEBUG)

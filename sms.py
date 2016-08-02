@@ -350,8 +350,8 @@ class SMS(object):
         # tosca  : 
         # length : length of the message body
         stat,oa,alpha,scts1,scts2,tooa,fo,pid,dcs,sca,tosca,length=params[7:].split(',')
-        scts=scts1+scts2
-        return sca,scts,msg
+        scts= datetime.strptime(scts1+','+scts2, DATE_FMT)
+        return sca[1:-1],scts,msg
 
     def sendSMS(self, phoneNumber, msg):
         """

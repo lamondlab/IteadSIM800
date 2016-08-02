@@ -115,7 +115,7 @@ class SMS(object):
             bcmd=cmd.encode('utf-8')+b'\r'
             if addCR: bcmd+=b'\n'
 
-            self._logger.debug("Attempt {}, ({})".format(i+1, bcmd)
+            self._logger.debug("Attempt {}, ({})".format(i+1, bcmd))
             #self._serial.write(cmd.encode('utf-8')+b'\r')
             self._serial.write(bcmd)
             self._serial.flush()

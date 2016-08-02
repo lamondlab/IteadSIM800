@@ -169,12 +169,12 @@ class SMS(object):
         try: return True,data[index]
         except IndexError: return False, None
 
-    def getSingleResponse(self, cmd, response, beginning, divider=",", index=0):
+    def getSingleResponse(self, cmd, response, beginning, divider=",", index=0, timeout=.5, interByteTimeout=.1):
         """
         Run a command, get a single line response and the parse using the
         specified parameters.
         """
-        status,data=self.sendATCmdWaitReturnResp(cmd,response)
+        status,data=self.sendATCmdWaitReturnResp(cmd,response,timeout=timeout,interByteTimeout=interByteTimeout)
         if status!=ATResp.OK: return None
         if len(data)!=1: return None
         ok,data=self.parseReply(data[0], beginning, divider, index)
@@ -305,9 +305,11 @@ class SMS(object):
             self._logger.error("Failed to send CMGS command part 1! {}".format(status))
             return False
 
-        status,_response=self.sendATCmdWaitReturnResp(msg+"\r\n\x1a", "OK",
-                timeout=11., interByteTimeout=1.2)
-        return _response=="+CMGS" and status==Attempt.OK
+        #status,_response=self.sendATCmdWaitReturnResp(msg+"\r\n\x1a", "OK",
+        #        timeout=11., interByteTimeout=1.2)
+        #return _response=="+CMGS" and status==Attempt.OK
+        cmgs=self.getSingleResponse(msg+"\r\n\x1a", "OK", "+", divider=":", timeout=11., interByteTimeout=1.2)
+        return cmgs=="CMGS"
 
     #### USSD
     #### PDU Mode(?)

@@ -44,11 +44,11 @@ class SMSStatus(IntEnum):
 
     @classmethod
     def fromStat(cls, stat):
-        if stat=="REC UNREAD": return cls.Unread
-        elif stat=="REC READ": return cls.Read
-        elif stat=="STO UNSENT": return cls.Unsent
-        elif stat=="STO SENT": return cls.Sent
-        elif stat=="ALL": return cls.All
+        if stat=='"REC UNREAD"': return cls.Unread
+        elif stat=='"REC READ"': return cls.Read
+        elif stat=='"STO UNSENT"': return cls.Unsent
+        elif stat=='"STO SENT"': return cls.Sent
+        elif stat=='"ALL"': return cls.All
 
 class RSSI(IntEnum):
     """

@@ -315,7 +315,7 @@ class SMS(object):
         Send Unstructured Supplementary Service Data message
         """
         self._logger.debug("Send USSD: {}".format(ussd))
-        reply=self.getSingleResponse('AT+CUSD=1,"{}"'.format(ussd), "OK", "+CUSD: ", index=1)
+        reply=self.getSingleResponse('AT+CUSD=1,"{}"'.format(ussd), "OK", "+CUSD: ", index=1, timeout=11., interByteTimeout=1.2)
         return reply
 
     #### USSD

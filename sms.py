@@ -382,7 +382,7 @@ class SMS(object):
         return SMSStatus.fromStat(stat),oa[1:-1],scts,msg
 
     def readAllSMS(self, status=SMSStatus.All):
-        self._logger.debug("Read SMS: {}".format(number))
+        self._logger.debug("Read All SMS")
         if not self.setSMSMessageFormat(SMSMessageFormat.Text):
             self._logger.error("Failed to set SMS Message Format!")
             return None

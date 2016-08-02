@@ -298,7 +298,7 @@ class SMS(object):
         self._logger.debug("Send SMS: {} '{}'".format(phoneNumber, msg))
         if not self.setSMSMessageFormat(SMSMessageFormat.Text): return False
 
-        status=self.sendATCmdWaitResp('AT+CMGS="{}"'.format(phoneNumber), "> ", addCR=True)
+        status=self.sendATCmdWaitResp('AT+CMGS="{}"'.format(phoneNumber), ">", addCR=True)
         if status!=ATResp.OK: return False
 
         status,_response=self.sendATCmdWaitReturnResp(msg+"\r\n\x1a", "OK",

@@ -50,6 +50,14 @@ class SMSStatus(IntEnum):
         elif stat=='"STO SENT"': return cls.Sent
         elif stat=='"ALL"': return cls.All
 
+    @classmethod
+    def toStat(cls, stat):
+        if stat==cls.Unread: return "REC UNREAD"
+        elif stat==cls.Read: return "REC READ"  
+        elif stat==cls.Unsent: return "STO UNSENT"  
+        elif stat==cls.Sent: return "STO SENT"  
+        elif stat==cls.All: return "ALL"          
+
 class RSSI(IntEnum):
     """
     Received Signal Strength Indication as 'bars'.
@@ -345,14 +353,14 @@ class SMS(object):
         self._logger.debug("Read SMS: {}".format(number))
         if not self.setSMSMessageFormat(SMSMessageFormat.Text):
             self._logger.error("Failed to set SMS Message Format!")
-            return False
+            return None
 
         if not self.setSMSTextMode(SMSTextMode.Show):
             self._logger.error("Failed to set SMS Text Mode!")
-            return False
+            return None
 
         status,(params,msg)=self.sendATCmdWaitReturnResp("AT+CMGR={}".format(number),"OK")
-        if status!=ATResp.OK or not params.startswith("+CMGR: "): return False,None
+        if status!=ATResp.OK or not params.startswith("+CMGR: "): return None
 
         # stat   : message status = "REC UNREAD", "REC READ", "STO UNSENT", "STO SENT", "ALL"
         # oa     : originating address
@@ -372,6 +380,30 @@ class SMS(object):
         scts=scts[:-1]+'00"'
         scts=datetime.strptime(scts, DATE_FMT)
         return SMSStatus.fromStat(stat),oa[1:-1],scts,msg
+
+    def readAllSMS(self, status=SMSStatus.All):
+        self._logger.debug("Read SMS: {}".format(number))
+        if not self.setSMSMessageFormat(SMSMessageFormat.Text):
+            self._logger.error("Failed to set SMS Message Format!")
+            return None
+
+        if not self.setSMSTextMode(SMSTextMode.Show):
+            self._logger.error("Failed to set SMS Text Mode!")
+            return None
+
+        status,msgs=self.sendATCmdWaitReturnResp("AT+CMGL={}".format(status), "OK")
+        if status!=ATResp.OK or not msgs[0].startswith("+CMGL: ") or len(msgs)%2!=0: return None
+
+        formatted=[]
+        for n in range(0, len(msgs), 2):
+            params,msg=msgs[n:n+2]
+            loc,stat,oa,alpha,scts1,scts2,tooa,fo,pid,dcs,sca,tosca,length=params[7:].split(',')
+            scts=scts1+','+scts2
+            tz=scts[-2:]
+            scts=scts[:-1]+'00"'
+            scts=datetime.strptime(scts, DATE_FMT)
+            formatted.append((loc,SMSStatus.fromStat(stat),oa[1:-1],scts,msg))
+        return formatted
 
     def deleteSMS(self, number):
         """
@@ -429,5 +461,6 @@ if __name__=="__main__":
     #print(s.sendUSSD(BALANCE_USSD))
     #print(s.getLastError())
     print(s.getNumSMS())
-    print(s.readSMS(1))
-    print(s.deleteSMS(1))
+    #print(s.readSMS(1))
+    #print(s.deleteSMS(1))
+    print(s.readAllSMS())

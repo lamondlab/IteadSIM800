@@ -8,7 +8,6 @@ PORT="/dev/ttyAMA0"
 BAUD=9600
 GSM_ON=11
 GSM_RESET=12
-#DATE_FMT='"%y/%m/%d,%H:%M:%S+00"'
 DATE_FMT='"%y/%m/%d,%H:%M:%S%z"'
 
 APN="giffgaff.com"
@@ -35,6 +34,21 @@ class SMSMessageFormat(IntEnum):
 class SMSTextMode(IntEnum):
     Hide=0
     Show=1
+
+class SMSStatus(IntEnum):
+    Unread=0
+    Read=1
+    Unsent=2
+    Sent=3
+    All=4
+
+    @classmethod
+    def fromStat(cls, stat):
+        if stat=="REC UNREAD": return cls.Unread
+        elif stat=="REC READ": return cls.Read
+        elif stat=="STO UNSENT": return cls.Unsent
+        elif stat=="STO SENT": return cls.Sent
+        elif stat=="ALL": return cls.All
 
 class RSSI(IntEnum):
     """
@@ -326,7 +340,7 @@ class SMS(object):
 
     def readSMS(self, number):
         """
-        Returns phone number, date/time and message in location specified by 'number'
+        Returns status, phone number, date/time and message in location specified by 'number'.
         """
         self._logger.debug("Read SMS: {}".format(number))
         if not self.setSMSMessageFormat(SMSMessageFormat.Text):
@@ -357,7 +371,18 @@ class SMS(object):
         tz=scts[-2:]
         scts=scts[:-1]+'00"'
         scts=datetime.strptime(scts, DATE_FMT)
-        return sca[1:-1],scts,msg
+        return SMSStatus.fromStat(stat),oa[1:-1],scts,msg
+
+    def deleteSMS(self, number):
+        """
+        Delete the SMS in location specified by 'number'.
+        """
+        self._logger.debug("Delete SMS: {}".format(number))
+        if not self.setSMSMessageFormat(SMSMessageFormat.Text):
+            self._logger.error("Failed to set SMS Message Format!")
+            return False        
+        status=self.sendATCmdWaitResp("AT+CMGD={:03d}".format(number), "OK")
+        return status==ATResp.OK
 
     def sendSMS(self, phoneNumber, msg):
         """
@@ -397,9 +422,9 @@ if __name__=="__main__":
     print(s.getNetworkStatus())
     print(s.getRSSI())
     #print(s.enableNetworkTimeSync(True))
-    print(s.getTime())
-    print(s.setTime(datetime.now()))
-    print(s.getTime())
+    # print(s.getTime())
+    # print(s.setTime(datetime.now()))
+    # print(s.getTime())
     #print(s.sendSMS("+441234567890", "Hello World!"))
     #print(s.sendUSSD(BALANCE_USSD))
     #print(s.getLastError())

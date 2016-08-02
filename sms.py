@@ -14,6 +14,8 @@ APN="giffgaff.com"
 APN_USERNAME="giffgaff"
 APN_PASSWORD="" # Leave blank
 
+BALANCE_USSD="*100#"
+
 # Balance: *100*7#
 # Remaining Credit: *100#
 # Voicemail: 443 (costs 8p!)
@@ -305,11 +307,16 @@ class SMS(object):
             self._logger.error("Failed to send CMGS command part 1! {}".format(status))
             return False
 
-        #status,_response=self.sendATCmdWaitReturnResp(msg+"\r\n\x1a", "OK",
-        #        timeout=11., interByteTimeout=1.2)
-        #return _response=="+CMGS" and status==Attempt.OK
         cmgs=self.getSingleResponse(msg+"\r\n\x1a", "OK", "+", divider=":", timeout=11., interByteTimeout=1.2)
         return cmgs=="CMGS"
+
+    def sendUSSD(self, ussd):
+        """
+        Send Unstructured Supplementary Service Data message
+        """
+        self._logger.debug("Send USSD: {}".format(ussd))
+        reply=self.getSingleResponse('AT+CUSD=1,"{}"'.format(ussd), "OK", "+CUSD: ", index=1)
+        return reply
 
     #### USSD
     #### PDU Mode(?)
@@ -332,4 +339,5 @@ if __name__=="__main__":
     #print(s.setTime(datetime.now()))
     #print(s.getTime())
     #print(s.sendSMS("+441234567890", "Hello World!"))
+    print(s.sendUSSD(BALANCE_USSD))
     print(s.getLastError())

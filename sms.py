@@ -296,10 +296,14 @@ class SMS(object):
         Send the specified message text to the provided phone number.
         """
         self._logger.debug("Send SMS: {} '{}'".format(phoneNumber, msg))
-        if not self.setSMSMessageFormat(SMSMessageFormat.Text): return False
+        if not self.setSMSMessageFormat(SMSMessageFormat.Text):
+            self._logger.error("Failed to set SMS Message Format!")
+            return False
 
         status=self.sendATCmdWaitResp('AT+CMGS="{}"'.format(phoneNumber), ">", addCR=True)
-        if status!=ATResp.OK: return False
+        if status!=ATResp.OK:
+            self._logger.error("Failed to send CMGS command part 1! {}".format(status))
+            return False
 
         status,_response=self.sendATCmdWaitReturnResp(msg+"\r\n\x1a", "OK",
                 timeout=11., interByteTimeout=1.2)

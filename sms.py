@@ -25,7 +25,7 @@ class ATResp(IntEnum):
     ErrorDifferentResponse=0
     OK=1
 
-class SMSMeesageFormat(IntEnum):
+class SMSMessageFormat(IntEnum):
     PDU=0
     Text=1
 
@@ -292,7 +292,7 @@ class SMS(object):
         Send the specified message text to the provided phone number.
         """
         self._logger.debug("Send SMS: {} '{}'".format(phoneNumber, msg))
-        if not self.setSMSMessageFormat(SMSMeesageFormat.Text): return False
+        if not self.setSMSMessageFormat(SMSMessageFormat.Text): return False
 
         status=self.sendATCmdWaitResp('AT+CMGS="{}"'.format(phoneNumber), "> ")
         if status!=ATResp.OK: return False

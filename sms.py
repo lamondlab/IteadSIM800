@@ -355,8 +355,8 @@ class SMS(object):
 
         scts=scts1+','+scts2
         tz=scts[-2:]
-        scts=scts[:-2]+"00"
-        scts=datetime.strptime(scts+"00", DATE_FMT)
+        scts=scts[:-3]+'00"'
+        scts=datetime.strptime(scts, DATE_FMT)
         return sca[1:-1],scts,msg
 
     def sendSMS(self, phoneNumber, msg):

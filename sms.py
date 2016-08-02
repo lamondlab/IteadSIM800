@@ -284,7 +284,7 @@ class SMS(object):
         self._logger.debug("Get the current time")
         time=self.getSingleResponse("AT+CCLK?","OK","+CCLK: ", divider="'")
         if time is None: return time
-        return datetime.strptime(time+"00", DATE_FMT)
+        return datetime.strptime(time[:-1]+'00"', DATE_FMT)
 
     def setTime(self, time):
         """

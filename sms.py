@@ -397,7 +397,8 @@ class SMS(object):
         formatted=[]
         for n in range(0, len(msgs), 2):
             params,msg=msgs[n:n+2]
-            loc,stat,oa,alpha,scts1,scts2,tooa,fo,pid,dcs,sca,tosca,length=params[7:].split(',')
+            if n==0: params=params[7:]
+            loc,stat,oa,alpha,scts1,scts2,tooa,fo,pid,dcs,sca,tosca,length=params.split(',')
             scts=scts1+','+scts2
             tz=scts[-2:]
             scts=scts[:-1]+'00"'

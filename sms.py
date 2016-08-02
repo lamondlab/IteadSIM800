@@ -10,6 +10,16 @@ GSM_ON=11
 GSM_RESET=12
 DATE_FMT='"%y/%m/%d,%H:%M:%S+00"'
 
+APN="giffgaff.com"
+APN_USERNAME="giffgaff"
+APN_PASSWORD="" # Leave blank
+
+# Balance: *100*7#
+# Remaining Credit: *100#
+# Voicemail: 443 (costs 8p!)
+# Text Delivery Receipt (start with): *0#
+# Hide calling number: #31#
+
 class ATResp(IntEnum):
     ErrorNoResponse=-1
     ErrorDifferentResponse=0
@@ -311,5 +321,5 @@ if __name__=="__main__":
     print(s.getTime())
     print(s.setTime(datetime.now()))
     print(s.getTime())
-    print(s.sendSMS("+441234567890", "Hello World!"))
+    #print(s.sendSMS("+441234567890", "Hello World!"))
     print(s.getLastError())

@@ -430,3 +430,4 @@ if __name__=="__main__":
     #print(s.getLastError())
     print(s.getNumSMS())
     print(s.readSMS(1))
+    print(s.deleteSMS(1))

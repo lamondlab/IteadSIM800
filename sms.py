@@ -318,7 +318,9 @@ class SMS(object):
             return False
 
         num=self.getSingleResponse('AT+CPMS?', "OK", "+CPMS: ", divider='"SM",', index=1)
-        return num
+        if num is None: return num
+        n,t,*_=num.split(',')
+        return int(n),int(t)
 
     def sendSMS(self, phoneNumber, msg):
         """

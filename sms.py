@@ -8,7 +8,8 @@ PORT="/dev/ttyAMA0"
 BAUD=9600
 GSM_ON=11
 GSM_RESET=12
-DATE_FMT='"%y/%m/%d,%H:%M:%S+00"'
+#DATE_FMT='"%y/%m/%d,%H:%M:%S+00"'
+DATE_FMT='"%y/%m/%d,%H:%M:%S%z"'
 
 APN="giffgaff.com"
 APN_USERNAME="giffgaff"
@@ -283,7 +284,7 @@ class SMS(object):
         self._logger.debug("Get the current time")
         time=self.getSingleResponse("AT+CCLK?","OK","+CCLK: ", divider="'")
         if time is None: return time
-        return datetime.strptime(time, DATE_FMT)
+        return datetime.strptime(time+"00", DATE_FMT)
 
     def setTime(self, time):
         """
@@ -350,7 +351,11 @@ class SMS(object):
         # tosca  : 
         # length : length of the message body
         stat,oa,alpha,scts1,scts2,tooa,fo,pid,dcs,sca,tosca,length=params[7:].split(',')
-        scts= datetime.strptime(scts1+','+scts2, DATE_FMT)
+
+        scts=scts1+','+scts2
+        tz=scts[-2:]
+        scts=scts[:-2]+"00"
+        scts=datetime.strptime(scts+"00", DATE_FMT)
         return sca[1:-1],scts,msg
 
     def sendSMS(self, phoneNumber, msg):
@@ -391,9 +396,9 @@ if __name__=="__main__":
     print(s.getNetworkStatus())
     print(s.getRSSI())
     #print(s.enableNetworkTimeSync(True))
-    #print(s.getTime())
-    #print(s.setTime(datetime.now()))
-    #print(s.getTime())
+    print(s.getTime())
+    print(s.setTime(datetime.now()))
+    print(s.getTime())
     #print(s.sendSMS("+441234567890", "Hello World!"))
     #print(s.sendUSSD(BALANCE_USSD))
     #print(s.getLastError())

@@ -317,7 +317,7 @@ class SMS(object):
             self._logger.error("Failed to set SMS Text Mode!")
             return False
 
-        num=self.getSingleResponse('AT+CPMS', "OK", "+CPMS: ", divider='"SM",')
+        num=self.getSingleResponse('AT+CPMS?', "OK", "+CPMS: ", divider='"SM",')
         return num
 
     def sendSMS(self, phoneNumber, msg):

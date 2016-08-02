@@ -324,7 +324,7 @@ class SMS(object):
 
     def readSMS(self, number):
         """
-        Returns phone number and message in location specified by 'number'
+        Returns phone number, date/time and message in location specified by 'number'
         """
         self._logger.debug("Read SMS: {}".format(number))
         if not self.setSMSMessageFormat(SMSMessageFormat.Text):
@@ -349,8 +349,9 @@ class SMS(object):
         # sca    : 
         # tosca  : 
         # length : length of the message body
-        stat,oa,alpha,scts,tooa,fo,pid,dcs,sca,tosca,length=params[7:].split(',')
-        return sca,msg
+        stat,oa,alpha,scts1,scts2,tooa,fo,pid,dcs,sca,tosca,length=params[7:].split(',')
+        scts=scts1+scts2
+        return sca,scts,msg
 
     def sendSMS(self, phoneNumber, msg):
         """

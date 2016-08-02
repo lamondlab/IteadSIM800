@@ -391,7 +391,7 @@ class SMS(object):
             self._logger.error("Failed to set SMS Text Mode!")
             return None
 
-        status,msgs=self.sendATCmdWaitReturnResp("AT+CMGL={}".format(SMSStatus.toStat(status)), "OK")
+        status,msgs=self.sendATCmdWaitReturnResp('AT+CMGL="{}"'.format(SMSStatus.toStat(status)), "OK")
         if status!=ATResp.OK or not msgs[0].startswith("+CMGL: ") or len(msgs)%2!=0: return None
 
         formatted=[]

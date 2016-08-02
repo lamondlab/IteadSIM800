@@ -31,6 +31,10 @@ class SMSMessageFormat(IntEnum):
     PDU=0
     Text=1
 
+class SMSTextMode(IntEnum):
+    Hide=0
+    Show=1
+
 class RSSI(IntEnum):
     """
     Received Signal Strength Indication as 'bars'.
@@ -296,6 +300,26 @@ class SMS(object):
         status=self.sendATCmdWaitResp("AT+CMGF={}".format(format), "OK")
         return status==ATResp.OK
 
+    def setSMSTextMode(self, mode):
+        status=self.sendATCmdWaitResp("AT+CSDH={}".format(mode), "OK")
+        return status==ATResp.OK
+
+    def getNumSMS(self):
+        """
+        Get the number of SMS on SIM card
+        """
+        self._logger.debug("Get Number of SMS")
+        if not self.setSMSMessageFormat(SMSMessageFormat.Text):
+            self._logger.error("Failed to set SMS Message Format!")
+            return False
+
+        if not self.setSMSTextMode(SMSTextMode.Show):
+            self._logger.error("Failed to set SMS Text Mode!")
+            return False
+
+        num=self.getSingleResponse('AT+CPMS', "OK", "+CPMS: ", divider='"SM",')
+        return num
+
     def sendSMS(self, phoneNumber, msg):
         """
         Send the specified message text to the provided phone number.
@@ -330,7 +354,7 @@ if __name__=="__main__":
     print(s.getIMEI())
     print(s.getVersion())
     print(s.getSIMCCID())
-    print(s.getLastError())
+    #print(s.getLastError())
     print(s.getNetworkStatus())
     print(s.getRSSI())
     #print(s.enableNetworkTimeSync(True))
@@ -338,5 +362,6 @@ if __name__=="__main__":
     #print(s.setTime(datetime.now()))
     #print(s.getTime())
     #print(s.sendSMS("+441234567890", "Hello World!"))
-    print(s.sendUSSD(BALANCE_USSD))
-    print(s.getLastError())
+    #print(s.sendUSSD(BALANCE_USSD))
+    #print(s.getLastError())
+    print(s.getNumSMS())

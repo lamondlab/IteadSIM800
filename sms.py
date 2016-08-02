@@ -291,7 +291,7 @@ class SMS(object):
         """
         self._logger.debug("Set the current time: {}".format(time))
         time=datetime.strftime(time, DATE_FMT)
-        if time[-3]!="+": time+="+00"
+        if time[-4]!="+": time=time[:-1]+'+00"'
         status=self.sendATCmdWaitResp("AT+CCLK={}".format(time),"OK")
         return status==ATResp.OK
 

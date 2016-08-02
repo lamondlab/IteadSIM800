@@ -102,7 +102,7 @@ class SMS(object):
         IO.output(GSM_ON, IO.LOW)
         sleep(5.)
 
-    def sendATCmdWaitResp(self, cmd, response, timeout=.5, interByteTimeout=.1, attempts=1):
+    def sendATCmdWaitResp(self, cmd, response, timeout=.5, interByteTimeout=.1, attempts=1, addCR=False):
         """
         This function is designed to check for simple one line responses, e.g. 'OK'.
         """
@@ -112,8 +112,12 @@ class SMS(object):
 
         status=ATResp.ErrorNoResponse
         for i in range(attempts):
-            self._logger.debug("Attempt {}".format(i+1))
-            self._serial.write(cmd.encode('utf-8')+b'\r')
+            bcmd=cmd.encode('utf-8')+b'\r'
+            if addCR: bcmd+=b'\n'
+
+            self._logger.debug("Attempt {}, ({})".format(i+1, bcmd)
+            #self._serial.write(cmd.encode('utf-8')+b'\r')
+            self._serial.write(bcmd)
             self._serial.flush()
 
             lines=self._serial.readlines()
@@ -294,7 +298,7 @@ class SMS(object):
         self._logger.debug("Send SMS: {} '{}'".format(phoneNumber, msg))
         if not self.setSMSMessageFormat(SMSMessageFormat.Text): return False
 
-        status=self.sendATCmdWaitResp('AT+CMGS="{}"'.format(phoneNumber), "> ")
+        status=self.sendATCmdWaitResp('AT+CMGS="{}"'.format(phoneNumber), "> ", addCR=True)
         if status!=ATResp.OK: return False
 
         status,_response=self.sendATCmdWaitReturnResp(msg+"\r\n\x1a", "OK",

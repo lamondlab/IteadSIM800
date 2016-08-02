@@ -355,7 +355,7 @@ class SMS(object):
 
         scts=scts1+','+scts2
         tz=scts[-2:]
-        scts=scts[:-3]+'00"'
+        scts=scts[:-1]+'00"'
         scts=datetime.strptime(scts, DATE_FMT)
         return sca[1:-1],scts,msg
 

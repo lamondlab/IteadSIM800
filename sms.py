@@ -322,6 +322,36 @@ class SMS(object):
         n,t,*_=num.split(',')
         return int(n),int(t)
 
+    def readSMS(self, number):
+        """
+        Returns phone number and message in location specified by 'number'
+        """
+        self._logger.debug("Read SMS: {}".format(number))
+        if not self.setSMSMessageFormat(SMSMessageFormat.Text):
+            self._logger.error("Failed to set SMS Message Format!")
+            return False
+
+        if not self.setSMSTextMode(SMSTextMode.Show):
+            self._logger.error("Failed to set SMS Text Mode!")
+            return False
+
+        status,(params,msg)=self.sendATCmdWaitReturnResp("AT+CMGR={}".format(number),"OK")
+        if status!=ATResp.OK or not params.startswith("+CMGR: "): return False,None
+
+        # stat   : message status = "REC UNREAD", "REC READ", "STO UNSENT", "STO SENT", "ALL"
+        # oa     : originating address
+        # alpha  : string of "oa" or "da"
+        # scts   : service center timestamp "YY/MM/DD,HH:MM:SS+ZZ"
+        # tooa   : originating address type
+        # fo     : 
+        # pid    : protocol ID
+        # dcs    : data coding scheme
+        # sca    : 
+        # tosca  : 
+        # length : length of the message body
+        stat,oa,alpha,scts,tooa,fo,pid,dcs,sca,tosca,length=params[7:].split(',')
+        return sca,msg
+
     def sendSMS(self, phoneNumber, msg):
         """
         Send the specified message text to the provided phone number.
@@ -367,3 +397,4 @@ if __name__=="__main__":
     #print(s.sendUSSD(BALANCE_USSD))
     #print(s.getLastError())
     print(s.getNumSMS())
+    print(s.readSMS(1))

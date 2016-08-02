@@ -218,7 +218,7 @@ class SMS(object):
         """
         Get the IMEI number of the module
         """
-        self._logger.debug("Get Internation Mobile Equipment Identity (IMEI)")
+        self._logger.debug("Get International Mobile Equipment Identity (IMEI)")
         status,imei=self.sendATCmdWaitReturnResp("AT+GSN","OK")
         if status==ATResp.OK and len(imei)==1: return imei[0]
         return None
@@ -318,8 +318,8 @@ if __name__=="__main__":
     print(s.getNetworkStatus())
     print(s.getRSSI())
     #print(s.enableNetworkTimeSync(True))
-    print(s.getTime())
-    print(s.setTime(datetime.now()))
-    print(s.getTime())
+    #print(s.getTime())
+    #print(s.setTime(datetime.now()))
+    #print(s.getTime())
     #print(s.sendSMS("+441234567890", "Hello World!"))
     print(s.getLastError())

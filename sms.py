@@ -97,18 +97,20 @@ class NetworkStatus(IntEnum):
 def cleanup(): IO.cleanup()
 
 class SMS(object):
-    def __init__(self, port, baud, loglevel=logging.WARNING):
+    def __init__(self, port, baud, logger=None, loglevel=logging.WARNING):
         self._port=port
         self._baud=baud
 
         self._ready=False
         self._serial=None
 
-        self._logger=logging.getLogger("SMS")
-        handler=logging.StreamHandler(sys.stdout)
-        handler.setFormatter(logging.Formatter("%(asctime)s : %(levelname)s -> %(message)s"))
-        self._logger.addHandler(handler)
-        self._logger.setLevel(loglevel)
+        if logger: self._logger=logger
+        else:
+            self._logger=logging.getLogger("SMS")
+            handler=logging.StreamHandler(sys.stdout)
+            handler.setFormatter(logging.Formatter("%(asctime)s : %(levelname)s -> %(message)s"))
+            self._logger.addHandler(handler)
+            self._logger.setLevel(loglevel)
 
     def setup(self):
         """

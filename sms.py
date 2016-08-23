@@ -445,7 +445,7 @@ class SMS(object):
         return reply
 
 if __name__=="__main__":
-    s=SMS(PORT,BAUD,logging.DEBUG)
+    s=SMS(PORT,BAUD,loglevel=logging.DEBUG)
     s.setup()
     if not s.turnOn(): exit(1)
     if not s.setEchoOff(): exit(1)
@@ -454,16 +454,19 @@ if __name__=="__main__":
     print(s.getVersion())
     print(s.getSIMCCID())
     #print(s.getLastError())
-    print(s.getNetworkStatus())
+    ns=s.getNetworkStatus()
+    print(ns)
+    if ns not in (NetworkStatus.RegisteredHome, NetworkStatus.RegisteredRoaming):
+        exit(1)
     print(s.getRSSI())
     #print(s.enableNetworkTimeSync(True))
     # print(s.getTime())
     # print(s.setTime(datetime.now()))
     # print(s.getTime())
-    #print(s.sendSMS("+441234567890", "Hello World!"))
-    #print(s.sendUSSD(BALANCE_USSD))
+    # print(s.sendSMS("+441234567890", "Hello World!"))
+    print(s.sendUSSD(BALANCE_USSD))
     #print(s.getLastError())
     print(s.getNumSMS())
     #print(s.readSMS(1))
     #print(s.deleteSMS(1))
-    print(s.readAllSMS())
+    #print(s.readAllSMS())

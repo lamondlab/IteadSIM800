@@ -14,6 +14,10 @@ BAUD=9600
 
 def taskWorker():
     _redis=Redis()
+    _redis.set("sim800NetworkStatus", "Unknown")
+    _redis.set("sim800Balance","0")
+    _redis.set("sim800RSSI",0)
+
     logger=logging.getLogger(LOGGER)
     balanceRegExp=re.compile(r"£(\d){1,2}\.(\d){2}")
 
@@ -27,6 +31,17 @@ def taskWorker():
             logger.critical("Failed to set SMS echo off!")
             return
         sms.setTime(datetime.now())
+
+        netStat="Unknown"
+        while netStat!="Good":
+            netStat=sms.getNetworkStatus()
+            if netStat is not None:
+                if netStat in (NetworkStatus.RegisteredHome, NetworkStatus.RegisteredRoaming):
+                    netStat="Good"
+                elif netStat in (NetworkStatus.Searching,): netStat="Searching"
+                else: netStat="Bad"
+            else: netStat="Unknown"
+            _redis.set("sim800NetworkStatus", netStat)
 
         checkBalance=True
         statusCheckTime=0.
